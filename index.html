@@ -1,35 +1,29 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <title>Bons plans — Agrégateur</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    body{font-family:system-ui,Arial;margin:20px;background:#f7f7f7}
-    .card{background:#fff;border-radius:10px;padding:12px;margin:12px 0;box-shadow:0 2px 6px rgba(0,0,0,0.06)}
-    .row{display:flex;gap:12px;align-items:center}
-    img.thumb{width:96px;height:64px;object-fit:cover;border-radius:6px}
-    .title{font-weight:700}
-    .price{font-size:1.1rem}
-    .old{color:#777;text-decoration:line-through;margin-left:8px}
-    .source{font-size:0.85rem;color:#555}
-    .actions{margin-left:auto}
-  </style>
-</head>
-<body>
-  <h1>Bons plans tech</h1>
-  <input id="q" placeholder="Rechercher (ex: casque, SSD...)" style="width:100%;padding:8px;margin-bottom:12px" />
-  <div id="list">Chargement des offres…</div>
-
 <script>
 async function loadDeals(){
+  const listEl = document.getElementById('list');
   try{
-    const res = await fetch('/deals.json', {cache: "no-store"});
-    if(!res.ok) throw new Error('Erreur réseau');
+    const res = await fetch('/deals.json', { cache: "no-store" });
+    if(!res.ok){
+      // essaye de lire le corps d'erreur pour aider au debug
+      let body = '';
+      try { body = await res.text(); } catch(e) { body = '(impossible de lire la réponse)'; }
+      const msg = `Erreur fetch: status ${res.status} ${res.statusText} — body: ${body}`;
+      console.error(msg);
+      throw new Error(msg);
+    }
     const data = await res.json();
     renderDeals(data);
   } catch(e){
-    document.getElementById('list').textContent = 'Impossible de charger les offres: ' + e.message;
+    console.error('loadDeals failed:', e);
+    listEl.innerHTML = `
+      <div style="color:#900;padding:12px;background:#fff;border-radius:8px;">
+        <strong>Impossible de charger les offres :</strong><br>
+        <small>${escapeHtml(e.message)}</small>
+      </div>
+      <p style="margin-top:12px">Astuce : vérifie que <code>deals.json</code> est présent dans le déploiement (dossier <code>public/</code> pour Next.js ou à la racine pour un site statique).</p>
+    `;
+    // fallback minimal pour que l'UI ne soit pas vide (optionnel)
+    // renderDeals([{ title: 'Offre de test (fallback)', url:'#', source:'local', timestamp: Date.now(), price: 0 }]);
   }
 }
 
@@ -65,5 +59,3 @@ document.getElementById('q').addEventListener('input', () => {
 // Chargement initial
 loadDeals();
 </script>
-</body>
-</html>
