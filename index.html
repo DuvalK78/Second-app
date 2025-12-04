@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Bons plans — Agrégateur</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{font-family:system-ui,Arial;margin:20px;background:#f7f7f7}
+    .card{background:#fff;border-radius:10px;padding:12px;margin:12px 0;box-shadow:0 2px 6px rgba(0,0,0,0.06)}
+    .row{display:flex;gap:12px;align-items:center}
+    img.thumb{width:96px;height:64px;object-fit:cover;border-radius:6px}
+    .title{font-weight:700}
+    .price{font-size:1.1rem}
+    .old{color:#777;text-decoration:line-through;margin-left:8px}
+    .source{font-size:0.85rem;color:#555}
+    .actions{margin-left:auto}
+  </style>
+</head>
+<body>
+  <h1>Bons plans tech</h1>
+  <input id="q" placeholder="Rechercher (ex: casque, SSD...)" style="width:100%;padding:8px;margin-bottom:12px" />
+  <div id="list">Chargement des offres…</div>
+
+<script>
+async function loadDeals(){
+  try{
+    const res = await fetch('/deals.json', {cache: "no-store"});
+    if(!res.ok) throw new Error('Erreur réseau');
+    const data = await res.json();
+    renderDeals(data);
+  } catch(e){
+    document.getElementById('list').textContent = 'Impossible de charger les offres: ' + e.message;
+  }
+}
+
+function renderDeals(deals){
+  const q = document.getElementById('q').value.toLowerCase();
+  const container = document.getElementById('list');
+  container.innerHTML = '';
+  const filtered = deals.filter(d => !q || (d.title && d.title.toLowerCase().includes(q)) || (d.tags && d.tags.join(' ').toLowerCase().includes(q)));
+  if(filtered.length === 0){ container.innerHTML = '<p>Aucune offre.</p>'; return; }
+  for(const d of filtered){
+    const el = document.createElement('div');
+    el.className = 'card row';
+    el.innerHTML = `
+      <img class="thumb" src="${d.image || 'placeholder.png'}" alt="">
+      <div>
+        <div class="title"><a href="${d.url}" target="_blank" rel="noopener noreferrer">${escapeHtml(d.title)}</a></div>
+        <div class="source">${escapeHtml(d.source)} • ${new Date(d.timestamp).toLocaleString()}</div>
+        <div class="price">${d.price ? d.price + '€' : 'Prix inconnu'}${d.old_price ? '<span class="old">' + d.old_price + '€</span>' : ''}</div>
+      </div>
+      <div class="actions"><a href="${d.url}" target="_blank" rel="nofollow noopener">Voir l'offre</a></div>
+    `;
+    container.appendChild(el);
+  }
+}
+
+function escapeHtml(str){ return String(str||'').replace(/[&<>"']/g, s=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[s])); }
+
+document.getElementById('q').addEventListener('input', () => {
+  // petite optimisation : on pourrait debouncer
+  loadDeals();
+});
+
+// Chargement initial
+loadDeals();
+</script>
+</body>
+</html>
