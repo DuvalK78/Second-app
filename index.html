@@ -1,3 +1,26 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Bons plans — Agrégateur</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{font-family:system-ui,Arial;margin:20px;background:#f7f7f7}
+    .card{background:#fff;border-radius:10px;padding:12px;margin:12px 0;box-shadow:0 2px 6px rgba(0,0,0,0.06)}
+    .row{display:flex;gap:12px;align-items:center}
+    img.thumb{width:96px;height:64px;object-fit:cover;border-radius:6px}
+    .title{font-weight:700}
+    .price{font-size:1.1rem}
+    .old{color:#777;text-decoration:line-through;margin-left:8px}
+    .source{font-size:0.85rem;color:#555}
+    .actions{margin-left:auto}
+  </style>
+</head>
+<body>
+  <h1>Bons plans tech</h1>
+  <input id="q" placeholder="Rechercher (ex: casque, SSD...)" style="width:100%;padding:8px;margin-bottom:12px" />
+  <div id="list">Chargement des offres…</div>
+
 <script>
 async function loadDeals(){
   const listEl = document.getElementById('list');
@@ -59,3 +82,6 @@ document.getElementById('q').addEventListener('input', () => {
 // Chargement initial
 loadDeals();
 </script>
+
+</body>
+</html>
