@@ -1,1 +1,12 @@
-[]
+[
+  {
+      "title": "MSI MAG 242C",
+      "url": "https://www.materiel.net/produit/202503180031.html",
+      "source": "materiel.net",
+      "timestamp": 1733337600000,
+      "price": 99.95,
+      "old_price": 119.95,
+      "tags": ["materiel.net"],
+      "image": "https://media.materiel.net/r900/products/MN0006252281.jpg"
+  }
+]
