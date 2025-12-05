@@ -9,22 +9,29 @@ def scrape_materielnet(url):
         html = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}).text
         soup = BeautifulSoup(html, "html.parser")
 
-        title = soup.select_one("h1.product__name").get_text(strip=True)
+        # Nouveau sélecteur titre
+        title_raw = soup.select_one("h1.pdp__title")
+        if not title_raw:
+            raise Exception("Titre introuvable")
+        title = title_raw.get_text(strip=True)
 
-        img = soup.select_one(".product__visual img")
+        # Nouvelle image
+        img = soup.select_one("img.pdp__picture")
         image_url = img["src"] if img else None
 
-        price_raw = soup.select_one(".product__price .price")
-        price = None
-        if price_raw:
-            price = float(
-                price_raw.get_text(strip=True)
-                .replace("€", "")
-                .replace(",", ".")
-                .replace(" ", "")
-            )
+        # Nouveau prix
+        price_raw = soup.select_one("div.pdp__price span")
+        if not price_raw:
+            raise Exception("Prix introuvable")
+        price = float(
+            price_raw.get_text(strip=True)
+            .replace("€", "")
+            .replace(",", ".")
+            .replace(" ", "")
+        )
 
-        old_price_raw = soup.select_one(".product__price .price--striked")
+        # Ancien prix (si dispo)
+        old_price_raw = soup.select_one("span.pdp__price--old")
         old_price = None
         if old_price_raw:
             old_price = float(
@@ -41,7 +48,7 @@ def scrape_materielnet(url):
             "timestamp": int(time.time() * 1000),
             "price": price,
             "old_price": old_price,
-            "tags": ["materiel.net", "tech", "promo"],
+            "tags": ["materiel.net", "tech"],
             "image": image_url
         }
 
