@@ -1,0 +1,37 @@
+name: Auto-scraper
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"   # Exécute toutes les 6h
+  workflow_dispatch:        # Permet d'exécuter manuellement
+  push:
+    paths:
+      - scraper_multi.py
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install requests beautifulsoup4
+
+    - name: Run scraper
+      run: python scraper_multi.py
+
+    - name: Commit updated deals.json
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@github.com"
+        git add deals.json
+        git commit -m "Auto-update deals.json" || echo "No changes"
+        git push
