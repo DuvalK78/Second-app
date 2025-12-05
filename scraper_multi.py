@@ -10,14 +10,29 @@ def scrape_materielnet(url):
         soup = BeautifulSoup(html, "html.parser")
 
         title = soup.select_one("h1.product__name").get_text(strip=True)
+
         img = soup.select_one(".product__visual img")
         image_url = img["src"] if img else None
 
         price_raw = soup.select_one(".product__price .price")
-        price = float(price_raw.get_text(strip=True).replace("€","").replace(",",".").replace(" ","")) if price_raw else None
+        price = None
+        if price_raw:
+            price = float(
+                price_raw.get_text(strip=True)
+                .replace("€", "")
+                .replace(",", ".")
+                .replace(" ", "")
+            )
 
         old_price_raw = soup.select_one(".product__price .price--striked")
-        old_price = float(old_price_raw.get_text(strip=True).replace("€","").replace(",",".").replace(" ","")) if old_price_raw else None
+        old_price = None
+        if old_price_raw:
+            old_price = float(
+                old_price_raw.get_text(strip=True)
+                .replace("€", "")
+                .replace(",", ".")
+                .replace(" ", "")
+            )
 
         return {
             "title": title,
@@ -26,7 +41,7 @@ def scrape_materielnet(url):
             "timestamp": int(time.time() * 1000),
             "price": price,
             "old_price": old_price,
-            "tags": ["materiel.net"],
+            "tags": ["materiel.net", "tech", "promo"],
             "image": image_url
         }
 
@@ -37,9 +52,7 @@ def scrape_materielnet(url):
 
 # ---------- LISTE DES PRODUITS À SCRAPER ----------
 PRODUCT_URLS = [
-    "https://www.materiel.net/produit/202503180031.html",
-    # "https://www.materiel.net/produit/xxxx.html",
-    # "http://autre-site.com/produit123",
+    "https://www.materiel.net/produit/202503180031.html"
 ]
 
 # ---------- ROUTAGE VERS LE BON SCRAPER ----------
