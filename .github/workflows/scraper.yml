@@ -2,7 +2,7 @@ name: Auto-scraper
 
 on:
   schedule:
-    - cron: "0 */6 * * *"   # Exécute toutes les 6 heures
+    - cron: "0 */1 * * *"   # Exécute toutes les 6 heures
   workflow_dispatch:        # Bouton "Run workflow" dans GitHub
   push:
     paths:
